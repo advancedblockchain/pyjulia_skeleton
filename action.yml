@@ -1,3 +1,12 @@
-name: 'PyJulia testing'
-description: 'Perform CI testing of mixed Python + Julia code
+name: 'PyJulia testing with pytest'
 author: 'jmmshn'
+description: 'Pyjulia testing'
+inputs:
+  src:
+    description: 'Always push your code and test case file as name.py and test_name.py'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+branding:
+  icon: 'award'
+  color: 'green'
