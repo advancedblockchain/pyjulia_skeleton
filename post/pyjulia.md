@@ -53,7 +53,7 @@ julia --project=. -e "using Pkg; Pkg.build();"
 ```
 assuming the current directory (`.`) contains the `Project.toml` file.  For the present example we will just have the `Example` package dependency as a placeholder.
 
-Once the dependencies tree has been built, you can access this particular Julia environment from within Python by running:
+Once the dependencies tree has been built, you can access this particular Julia environment from within your Python code by running:
 
 ```python
 from julia import Pkg
@@ -62,7 +62,52 @@ Pkg.activate("<Proj_Dir>")
 Where `<Proj_Dir>` is the directory where you have the `Project.toml` file.
 
 
+# Setting up a Mixed Python + Julia Project
 
+Now we have all the individual pices, the skeleton of a mixed Python + Julia project can look something like this:
+```
+.
+├── Project.toml
+├── requirements.txt
+├── setup.cfg
+├── setup.py
+├── src
+│   ├── py_jl
+│   │   ├── julia_funcs.jl
+│   │   └── julia_funcs.py
+└── tests
+    └── test_julia.py
 
+```
 
+Here the `setup.py` and `setup.cfg` files are used to install the present package as `py_jl`.
 
+The `setup.cfg` also contains additional information about how to run tests using `pytest`.
+
+```
+% cat setup.cfg
+[metadata]
+name = py_jl
+
+[options]
+zip_safe = False
+packages = find_namespace:
+include_package_data = True
+package_dir =
+    =src
+
+[options.packages.find]
+where = src
+exclude =
+    tests
+
+[tool:pytest]
+norecursedirs =
+    dist
+    build
+    .tox
+testpaths = ./tests/
+python_files = test_*.py%                                                                                                                                      
+```
+
+The full code is hosted on [GitHub](https://github.com/jmmshn/pyjulia_skeleton)
