@@ -51,7 +51,7 @@ In Julia, you can install the dependencies from the `Project.toml` file by runni
 ```bash
 julia --project=. -e "using Pkg; Pkg.build();"
 ```
-assuming the current directory (`.`) contains the `Project.toml` file.
+assuming the current directory (`.`) contains the `Project.toml` file.  For the present example we will just have the `Example` package dependency as a placeholder.
 
 Once the dependencies tree has been built, you can access this particular Julia environment from within Python by running:
 
@@ -60,6 +60,7 @@ from julia import Pkg
 Pkg.activate("<Proj_Dir>")
 ```
 Where `<Proj_Dir>` is the directory where you have the `Project.toml` file.
+
 
 
 
