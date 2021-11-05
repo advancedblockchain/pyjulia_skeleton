@@ -1,0 +1,28 @@
+name: Testing PyJulia
+
+on: [push]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 5
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install package
+      run: |
+        pip install -r requirements.txt
+        pip install pytest==6.2.5
+        pip install -e .
+    - name: Set up pyJulia
+      run: |
+        python -c "import julia; julia.install();"
+        julia --project=. -e "using Pkg; Pkg.build();"
+    - name: Test with pytest
+      run: |
+        pytest
