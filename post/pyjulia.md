@@ -15,4 +15,53 @@ The mechanics of embedding Julia in Python code using `PyJulia` has been covered
 and [here](https://towardsdatascience.com/run-native-julia-code-with-python-92d3e1079385).
 This post will focus on the best practices of connecting the Julia and Python codes in a new code base, as well as configuring GitHub actions to run automated continuous integration (CI) workflows for your mixed Python+Julia code.
 
-One of the 
+# Installing and configuring PyJulia for a project
+
+To get started, you will need to make sure that Python and Julia are installed on your machine.
+After that, you need to make sure you have the package manager for each language installed.
+The easiest way to install PyJulia is via [PyPI](https://pypi.org/project/PyJulia/) using the `pip` command:
+```sh
+pip install julia
+```
+
+Once you have installed PyJulia, you can use its built-in `install` command to install the required `PyCall` Julia package and perform the necessary setup:
+```python
+import julia
+julia.install()
+```
+
+According to the `PyJulia`'s documentation, the Python interpreter from `conda` is statically linked to `libpython` and `PyJulia` does not fully support such Python interpreters yet.
+The recommended workaround is to pass `compiled_modules=False` to the Julia constructor once to disable Julia's precompilation cache mechanism.
+```python
+from julia.api import Julia
+jl = Julia(compiled_modules=False)
+```
+Note this does affect performance, so you may consider switching to a different Python interpreter if performance is an issue.
+More information on this issue can be found [here](https://pyjulia.readthedocs.io/en/latest/troubleshooting.html).
+
+Now you can test your PyJulia installation by running the following code to test your installation.
+```python
+from julia import Main
+Main.println("Hello, world!")
+```
+
+For most Python + Julia projects, you will also need to install dependencies for both languages.
+In python, simply run `pip install -r requirements.txt` to install the dependencies.
+In Julia, you can install the dependencies from the `Project.toml` file by running
+```bash
+julia --project=. -e "using Pkg; Pkg.build();"
+```
+assuming the current directory (`.`) contains the `Project.toml` file.
+
+Once the dependencies tree has been built, you can access this particular Julia environment from within Python by running:
+
+```python
+from julia import Pkg
+Pkg.activate("<Proj_Dir>")
+```
+Where `<Proj_Dir>` is the directory where you have the `Project.toml` file.
+
+
+
+
+
