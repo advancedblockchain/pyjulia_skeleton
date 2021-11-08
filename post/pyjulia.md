@@ -206,6 +206,13 @@ jobs:
       run: |
         pytest
 ```
+Note the important lines here are
+
+```
+python -c "import julia; julia.install();"
+julia --project=. -e "using Pkg; Pkg.build();"
+```
+Which ensures that the `PyCall` package is install Julia-side and that the all the Julia functions in the present repo are made available to `PyJulia`.
 
 # Conclusion
 
