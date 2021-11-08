@@ -6,5 +6,5 @@ Codebase demonstrating how to get started setting up Python and Julia on Github.
 
 Feel free to clone this code and use it in your own research!
 
-## Authors
+## Author
 Advanced Blockchain Research
