@@ -1,5 +1,10 @@
 # Setting up a Mixed Python/Julia Project on GitHub
 
+
+At Advanced Block AG (ABAG) Research Group, we primarily work with Python for our data analytics.
+However, as Julia becomes more popular, the benefit of its performance and its ease of use in defining astract mathematical operation should now be ignored.
+For the near future, we foresee that mixed Python + Julia codebases will be the most sucessful for complex data analytics tasks, especially when the operations hit the performance ceiling of Python.
+
 This post will demonstrate the setup of a minimal GitHub repo containing both Python and Julia codes.
 Julia, as a language, is most often used for abstract mathematics and scientific computing, and writing math codes without proper testing is a sure way to invite pain and frustration.
 As such, we will focus on helping you set up a repository with mixed python and Julia codes and implementing automated testing.
@@ -64,7 +69,9 @@ Where `<Proj_Dir>` is the directory where you have the `Project.toml` file.
 
 # Setting up a Mixed Python + Julia Project
 
-Now we have all the individual pices, the skeleton of a mixed Python + Julia project can look something like this:
+Now we have all the individual pices, the skeleton of a mixed Python + Julia project.
+The full code is hosted on [GitHub](https://github.com/jmmshn/pyjulia_skeleton), but we will discuss all the different parts of this skeleton repo below.
+The struture of the project is as follows:
 ```
 .
 ├── Project.toml
@@ -82,7 +89,7 @@ Now we have all the individual pices, the skeleton of a mixed Python + Julia pro
 
 Here the `setup.py` and `setup.cfg` files are used to install the present package as `py_jl`.
 
-The `setup.cfg` also contains additional information about how to run tests using `pytest`.
+Since testing is crucial for the dkind of numerical problems people typically use Julia to solve, the `setup.cfg` also contains additional information about how to run tests using `pytest`.
 
 ```
 % cat setup.cfg
@@ -110,4 +117,97 @@ testpaths = ./tests/
 python_files = test_*.py%                                                                                                                                      
 ```
 
-The full code is hosted on [GitHub](https://github.com/jmmshn/pyjulia_skeleton)
+Since Python is extremely object oriented and Julia is extremely functional, it is helpful to have a direct one-to-one mapping between all the user exposed functions in the two languages.
+To accomplish this, we will use the `julia_funcs.jl` file to define all the Julia function we want to expose and a corresponding `julia_funcs.py` file to defines simple python wrappers around these Julia functions.
+These simple python wrappers serves two important purposes:
+
+1. They are used to provide docstring for the exposed functions.
+2. They might be needed to clean up the type signatures python-side.
+
+As an example we have the following two files:
+
+
+```julia
+#./src/py_jl/julia_funcs.jl
+function hello()
+    println("Hello from Julia!")
+end
+
+function float_double(a::Float64)
+    return a * 2
+end
+```
+
+and
+
+```python
+#./src/py_jl/julia_funcs.py
+from pathlib import Path
+from julia.api import Julia
+jl = Julia(compiled_modules=False)
+from julia import Main, Pkg
+
+p = Path(__file__).parent / "julia_funcs.jl"
+Pkg.activate(str(p.parent.parent))
+Main.include(str(p))
+
+def hello():
+    """
+    Say hello using Julia.
+    """
+    return Main.hello()
+
+def float_double(n):
+    """
+    Return the number n doubled.
+    Args:
+        n: the number you want to double
+    """
+    tmp = float(n)
+    return Main.float_double(tmp)
+```
+
+For well established Julia packages the kind of type conversion show above should not be neccessary.
+And in fact the example above will work better if the typle signature of the Julia function's input is changed from `Float64` -> `Number`.
+However, for some packages, the type signature of the exposed functions might be less flexible so conversion python-side might be neccessary.
+
+# Continuous Integration with GitHub Actions
+
+Once you have set up the project, you can now set up GitHub Actions to run the tests.
+The following yml file is placed into the `.github/workflows` directory and will run automatically whenever a new commit is pushed.
+
+```yml
+name: Testing PyJulia
+
+on: [push]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 5
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install package
+      run: |
+        pip install -r requirements.txt
+        pip install pytest==6.2.5
+        pip install -e .
+    - name: Set up pyJulia
+      run: |
+        python -c "import julia; julia.install();"
+        julia --project=. -e "using Pkg; Pkg.build();"
+    - name: Test with pytest
+      run: |
+        pytest
+```
+
+# Conclusion
+
+We have now covered the basics of setting up a Python + Julia project as well as how to set up continuous integration with GitHub Actions.
+We hope this tutorial has been helpful to you and you can continue to learn more about the Julia language and how to use it in your own projects.

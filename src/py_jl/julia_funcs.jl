@@ -2,6 +2,6 @@ function hello()
     println("Hello from Julia!")
 end
 
-function return_number(n)
-    return n
+function float_double(a::Float64)
+    return a * 2
 end

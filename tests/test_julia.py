@@ -1,4 +1,4 @@
-from py_jl.julia_funcs import double
+from py_jl.julia_funcs import float_double
 
 def test_double():
-    assert double(1) == 2
+    assert float_double(1) == 2

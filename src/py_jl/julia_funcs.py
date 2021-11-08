@@ -8,12 +8,16 @@ Pkg.activate(str(p.parent.parent))
 Main.include(str(p))
 
 def hello():
+    """
+    Say hello using Julia.
+    """
     return Main.hello()
 
-def double(n):
+def float_double(n):
     """
     Return the number n doubled.
     Args:
         n: the number you want to double
     """
-    return n*2
+    tmp = float(n)
+    return Main.float_double(tmp)
