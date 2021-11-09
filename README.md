@@ -2,9 +2,9 @@
 
 [![Testing PyJulia](https://github.com/advancedblockchain/pyjulia_skeleton/actions/workflows/testing.yml/badge.svg)](https://github.com/advancedblockchain/pyjulia_skeleton/actions/workflows/testing.yml)
 
-Codebase demonstrating how to get started setting up Python and Julia on Github.
+This skeleton code shows how to set up Python and Julia.
 
-Feel free to clone this code and use it in your own research!
+Feel free to clone this and start your own Python + Julia project - use as you wish - have fun hacking! Let us know what you build.
 
 ## Author
 Advanced Blockchain Research
